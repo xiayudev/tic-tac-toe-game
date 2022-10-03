@@ -1,9 +1,8 @@
 import Swal from "sweetalert2";
 /** ### VARIABLES ### */
 
-const $container = document.getElementById("app")!;
-const $fragment = document.createDocumentFragment()!;
-const $turn = document.getElementById("turn")!;
+const $container = document.getElementById("app") as HTMLDivElement;
+const $turn = document.getElementById("turn") as HTMLParagraphElement;
 
 let player1Move = "X",
 	player2Move = "O";
@@ -15,11 +14,11 @@ let nextTurn = player1;
 $turn.innerHTML = "<b style='font-family: Kalam, cursive;'>Turno del jugador 1</b>";
 
 //Evento para resetear el juego
-document.getElementById("reset")!.addEventListener("click", (_) => {
+document.getElementById("reset")!.addEventListener("click", () => {
 	location.reload();
 });
 
-// ### TYPES ###
+/** ### TYPES ### */
 type Tie = {
 	botones: Array<HTMLButtonElement>;
 	boton: HTMLCollectionOf<HTMLButtonElement>;
@@ -40,49 +39,55 @@ type Winner = {
 	playerTurn: number;
 };
 
+type Movement = {
+	button: HTMLButtonElement;
+	move: string;
+	color: string;
+	turn: number;
+};
+
+const checkNextMove = (data: Movement) => {
+	const { button, move, color, turn } = data;
+	button.disabled = true;
+	button.textContent = move;
+	button.style.background = "#16213E";
+	button.style.color = color;
+	button.style.cursor = "default";
+	button.style.border = "2px solid #444";
+	$turn.innerHTML = `<b style='font-family: Kalam, cursive;'>Turno del jugador ${turn}</>`;
+	nextTurn = turn;
+};
+
 /** ### FUNCIONES ### */
 function drawMatrix() {
 	for (let i = 0; i < 9; i++) {
-		const $button = document.createElement("button");
-		let id = (i + 1).toString();
-		$button.onclick = function () {
-			const $cuadro = document.getElementById(id) as HTMLButtonElement;
+		let id = i + 1;
+		$container.innerHTML += `
+			<button class="boton" id="${id}">-</button>
+		`;
+	}
+	const $button = document.getElementsByClassName("boton") as HTMLCollectionOf<HTMLButtonElement>;
+	for (let boton of $button) {
+		boton.onclick = function () {
+			const $cuadro = document.getElementById(boton.id) as HTMLButtonElement;
 			if (nextTurn === 1) {
-				$cuadro.disabled = true;
-				$cuadro.innerText = player1Move;
-				$cuadro.style.background = "#16213E";
-				$cuadro.style.color = "#00f";
-				$cuadro.style.cursor = "default";
-				$cuadro.style.border = "2px solid #444";
-				$turn.innerHTML = "<b style='font-family: Kalam, cursive;'>Turno del jugador 2</>";
-				nextTurn = player2;
+				checkNextMove({
+					button: $cuadro,
+					move: player1Move,
+					color: "#00f",
+					turn: player2,
+				});
 			} else {
-				$cuadro.disabled = true;
-				$cuadro.innerText = player2Move;
-				$cuadro.style.background = "#16213E";
-				$cuadro.style.color = "#f00";
-				$cuadro.style.cursor = "default";
-				$cuadro.style.border = "2px solid #444";
-				$turn.innerHTML = "<b style='font-family: Kalam, cursive;'>Turno del jugador 1</b>";
-				nextTurn = player1;
+				checkNextMove({
+					button: $cuadro,
+					move: player2Move,
+					color: "#f00",
+					turn: player1,
+				});
 			}
 			checkWinner();
 		};
-		$button.classList.add("boton");
-		$button.setAttribute("id", `${i + 1}`);
-		$button.style.border = "2px solid #fff";
-		$button.style.color = "#fff";
-		$button.style.background = "#E94560";
-		$button.style.font = "22px Verdana";
-		$button.innerText = "-";
-		$button.style.width = "100px";
-		$button.style.height = "100px";
-		$button.style.cursor = "pointer";
-		$button.style.borderRadius = "10px";
-
-		$fragment.appendChild($button);
 	}
-	$container.appendChild($fragment);
 }
 
 function message(data: Message) {
@@ -132,7 +137,7 @@ function message(data: Message) {
 			copyButtons[i].style.border = "2px solid #444";
 		}
 	}
-	$turn.innerText = "";
+	$turn.textContent = "";
 }
 
 function winner(data: Winner) {
@@ -323,9 +328,7 @@ function checkWinner() {
 	});
 }
 
-function incio() {
-	drawMatrix();
-}
-
 // ### INICIO DEL JUEGO ###
-incio();
+window.onload = function () {
+	drawMatrix();
+};
