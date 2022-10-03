@@ -1,6 +1,7 @@
+/** ### IMPORTS ###*/
 import Swal from "sweetalert2";
-/** ### VARIABLES ### */
 
+/** ### VARIABLES ### */
 const $container = document.getElementById("app") as HTMLDivElement;
 const $turn = document.getElementById("turn") as HTMLParagraphElement;
 
@@ -46,6 +47,7 @@ type Movement = {
 	turn: number;
 };
 
+/** ### FUNCIONES ### */
 const checkNextMove = (data: Movement) => {
 	const { button, move, color, turn } = data;
 	button.disabled = true;
@@ -58,7 +60,6 @@ const checkNextMove = (data: Movement) => {
 	nextTurn = turn;
 };
 
-/** ### FUNCIONES ### */
 function drawMatrix() {
 	for (let i = 0; i < 9; i++) {
 		let id = i + 1;
